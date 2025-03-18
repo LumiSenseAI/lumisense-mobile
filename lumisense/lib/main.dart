@@ -21,11 +21,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Lumisense',
       theme: ThemeData(
-        scaffoldBackgroundColor: Colors.white,
+        scaffoldBackgroundColor: Color.fromARGB(255, 30, 30, 30),
         textSelectionTheme: TextSelectionThemeData(
-          cursorColor: Colors.black,
+          cursorColor: Color(0x0092FDFF),
         ),
       ),
       onGenerateRoute: AppRouter.generateRoute,

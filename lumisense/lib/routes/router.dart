@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-//import 'package:lumisense/pages/home_page.dart';
 import 'package:lumisense/pages/main_screen.dart';
 import 'package:lumisense/pages/login_page.dart';
 import 'package:lumisense/services/auth_service.dart';
@@ -12,14 +11,12 @@ class AppRouter {
     return MaterialPageRoute(
       builder: (context) {
         return FutureBuilder<bool>(
-          future: AuthService
-              .isAuthenticated(), // Vérifie si l'utilisateur est authentifié
+          future:
+              AuthService.isAuthenticated(), // Vérifie si l'utilisateur est authentifié
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               // Si en cours de vérification, afficher un loader
-              return Scaffold(
-                body: Center(child: CircularProgressIndicator()),
-              );
+              return Scaffold(body: Center(child: CircularProgressIndicator()));
             } else if (snapshot.hasData && snapshot.data == true) {
               // Si authentifié, charger les données de l'utilisateur
               return Consumer<UserProvider>(
@@ -33,7 +30,7 @@ class AppRouter {
                   }
 
                   // Vérification des rôles et redirection en fonction des rôles
-                  if (userProvider.roles != null) {
+                  if (userProvider.role != null) {
                     // if (userProvider.roles!.contains('ROLE_SUPERADMIN')) {
                     //   return AdminPage(); // Page spécifique pour un administrateur
                     // }

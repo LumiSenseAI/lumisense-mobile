@@ -3,15 +3,14 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class AuthService {
-  static const String _apiUrl = 'http://10.105.102.16:8000/api/login_check';
+  static const String _apiUrl = 'http://localhost:3000/api/auth/login';
   
   static Future<bool> login(String email, String password) async {
-    print(_apiUrl);
     final response = await http.post(
       Uri.parse(_apiUrl),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
-        'username': email,
+        'email': email,
         'password': password,
       }),
     );
@@ -33,23 +32,34 @@ class AuthService {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('jwt_token');
   }
-
+  
   static Future<Map<String, dynamic>?> getUserData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('jwt_token');
 
     if (token != null) {
       try {
-        Map<String, dynamic> decodedToken = jsonDecode(
-            ascii.decode(base64.decode(base64.normalize(token.split(".")[1]))));
+        List<String> parts = token.split(".");
+        if (parts.length != 3) {
+          print("Token JWT invalide !");
+          return null;
+        }
+
+        String payload = parts[1];
+        String normalizedPayload = base64.normalize(payload);
+        String decodedPayload = utf8.decode(base64.decode(normalizedPayload));
+
+        Map<String, dynamic> decodedToken = jsonDecode(decodedPayload);
 
         return decodedToken;
       } catch (e) {
+        print("Erreur lors du décodage du token: $e");
         return null;
       }
     }
     return null;
   }
+
 
  static Future<bool> isAuthenticated() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();

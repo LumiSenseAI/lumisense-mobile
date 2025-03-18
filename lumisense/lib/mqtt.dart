@@ -15,8 +15,8 @@ class Mqtt {
     client!.onSubscribed = onSubscribed;
 
     final connMessage = MqttConnectMessage()
-        .withClientIdentifier(clientIdentifier)
-        .withWillQos(MqttQos.exactlyOnce);
+      .withClientIdentifier(clientIdentifier)
+      .withWillQos(MqttQos.exactlyOnce);
     client!.connectionMessage = connMessage;
 
     try {

@@ -3,8 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:lumisense/providers/user_provider.dart';
 import 'package:lumisense/pages/home_page.dart';
 import 'package:lumisense/pages/profile_page.dart';
-import 'package:lumisense/widgets/sidebar.dart';
-import 'package:lumisense/services/auth_service.dart'; // Import AuthService
+import 'package:lumisense/pages/add_object.dart';
+import 'package:lumisense/services/audio_service.dart';
 
 class MainScreen extends StatefulWidget {
   @override
@@ -13,32 +13,18 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
-  bool _isSidebarOpen = false;
-
-  final List<Widget> _pages = [
-    HomePage(),
-    ProfilePage(),
-  ];
-
-  Future<void> _logout() async {
-    await AuthService.logout(); // Supprimer le token
-    Provider.of<UserProvider>(context, listen: false).clearUser(); // Effacer les infos utilisateur
-    Navigator.pushReplacementNamed(context, '/login'); // Rediriger vers la page de connexion
-  }
+  bool _isAddingObject = false;
 
   void _onItemTapped(int index) {
-    if (index == 2) {
-      _logout(); // Appel de la fonction logout
-    } else {
-      setState(() {
-        _selectedIndex = index;
-      });
-    }
+    setState(() {
+      _selectedIndex = index;
+      _isAddingObject = false;
+    });
   }
 
-  void _toggleSidebar() {
+  void _onAddObjectTapped() {
     setState(() {
-      _isSidebarOpen = !_isSidebarOpen;
+      _isAddingObject = true;
     });
   }
 
@@ -47,67 +33,80 @@ class _MainScreenState extends State<MainScreen> {
     final userProvider = Provider.of<UserProvider>(context);
 
     if (userProvider.username == null) {
-      return Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    double appBarHeight = AppBar().preferredSize.height;
-
     return Scaffold(
-      body: Stack(
-        children: [
-          // Contenu principal
-          Scaffold(
-            appBar: AppBar(
-              elevation: 0,
-              backgroundColor: Colors.transparent,
-              leading: IconButton(
-                icon: Icon(
-                  Icons.arrow_back_ios,
-                  color: Colors.black,
-                ),
-                onPressed: _toggleSidebar, // Ouvrir/fermer la sidebar avec la flèche
-              ),
-            ),
-            body: _pages[_selectedIndex],
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        leading: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Image.asset(
+            'assets/images/lumisense.png',
+            width: 70,
+            height: 70,
+            fit: BoxFit.contain,
           ),
-
-          // Sidebar
-          AnimatedPositioned(
-            left: _isSidebarOpen ? 0 : -MediaQuery.of(context).size.width, 
-            top: -25,
-            bottom: kBottomNavigationBarHeight, 
-            duration: Duration(milliseconds: 300), 
-            curve: Curves.easeInOut, 
-            child: GestureDetector(
-              onTap: () {},
-              child: SideBar(
-                appBarHeight: appBarHeight, 
-                onClose: _toggleSidebar, 
-              ),
-            ),
-          ),
-
-          // BottomNavigationBar
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: BottomNavigationBar(
-              currentIndex: _selectedIndex,
-              onTap: _onItemTapped,
-              backgroundColor: Colors.blue[900],
-              selectedItemColor: Colors.white,
-              unselectedItemColor: Colors.grey[300],
-              items: [
-                BottomNavigationBarItem(icon: Icon(Icons.explore), label: 'Explorer'),
-                BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profil'),
-                BottomNavigationBarItem(icon: Icon(Icons.exit_to_app), label: 'Déconnexion'),
-              ],
-            ),
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.add, color: Color(0xFF92FDFF)),
+            onPressed: _onAddObjectTapped,
           ),
         ],
+      ),
+      body: Center(
+        child: _isAddingObject
+            ? AddObjectPage()
+            : _selectedIndex == 0
+                ? HomePage()
+                : _selectedIndex == 1
+                    ? Container() // Placeholder for recording UI
+                    : ProfilePage(),
+      ),
+      bottomNavigationBar: Container(
+        height: 65,
+        decoration: BoxDecoration(
+          border: Border(
+            top: BorderSide(
+              color: Color(0xFF92FDFF),
+              width: 2,
+            ),
+          ),
+        ),
+        child: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
+          currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
+          backgroundColor: Color.fromARGB(255, 30, 30, 30),
+          selectedItemColor: Color(0xFF92FDFF),
+          unselectedItemColor: Color(0xFF92FDFF),
+          showSelectedLabels: false,
+          showUnselectedLabels: false,
+          items: [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.house),
+              label: '',
+            ),
+            BottomNavigationBarItem(
+              icon: GestureDetector(
+                onLongPressStart: (details) {
+                  AudioService.startRecording();
+                },
+                onLongPressEnd: (details) {
+                  AudioService.stopRecording();
+                },
+                child: Icon(Icons.mic),
+              ),
+              label: '',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              label: '',
+            ),
+          ],
+        ),
       ),
     );
   }

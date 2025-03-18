@@ -1,4 +1,4 @@
-# luminesense
+# lumisense
 
 A new Flutter project.
 

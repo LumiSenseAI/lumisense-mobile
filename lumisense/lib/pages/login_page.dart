@@ -21,16 +21,19 @@ class _LoginPageState extends State<LoginPage> {
     );
 
     if (success) {
-      await context.read<UserProvider>().loadUserData(); // Charge les données utilisateur
+      await context.read<UserProvider>().loadUserData();
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Connexion réussie !')),
       );
 
-      Navigator.pushReplacementNamed(context, '/home'); // Redirection
+      Navigator.popUntil(context, (route) => route.isFirst);
+      Navigator.pushReplacementNamed(context, '/home');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Échec de la connexion. Vérifiez vos identifiants.')),
+        SnackBar(
+          content: Text('Échec de la connexion. Vérifiez vos identifiants.'),
+        ),
       );
     }
   }
@@ -49,11 +52,11 @@ class _LoginPageState extends State<LoginPage> {
                 DelayedAnimation(
                   delay: 200,
                   child: Text(
-                    "ELIT CUSTOMER PORTAL",
+                    "Connexion",
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF124188),
+                      color: Color(0xFF92FDFF),
                     ),
                   ),
                 ),
@@ -65,7 +68,7 @@ class _LoginPageState extends State<LoginPage> {
                     decoration: InputDecoration(
                       hintText: "E-mail",
                       filled: true,
-                      fillColor: Colors.white,
+                      fillColor: Color(0xFF92FDFF),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -81,10 +84,12 @@ class _LoginPageState extends State<LoginPage> {
                     decoration: InputDecoration(
                       hintText: "Mot de passe",
                       filled: true,
-                      fillColor: Colors.white,
+                      fillColor: Color(0xFF92FDFF),
                       suffixIcon: IconButton(
                         icon: Icon(
-                          _obscureText ? Icons.visibility_off : Icons.visibility,
+                          _obscureText
+                              ? Icons.visibility_off
+                              : Icons.visibility,
                         ),
                         onPressed: () {
                           setState(() {
@@ -103,8 +108,8 @@ class _LoginPageState extends State<LoginPage> {
                   delay: 800,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF124188),
-                      foregroundColor: Colors.white,
+                      backgroundColor: Color(0xFF92FDFF),
+                      foregroundColor: Colors.black,
                       minimumSize: Size(double.infinity, 50),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -117,7 +122,7 @@ class _LoginPageState extends State<LoginPage> {
                 SizedBox(height: 30),
                 DelayedAnimation(
                   delay: 1000,
-                  child: Image.asset("assets/images/elitlogo2.png", height: 80),
+                  child: Image.asset("assets/images/lumisense.png", height: 80),
                 ),
                 SizedBox(height: 20),
               ],
