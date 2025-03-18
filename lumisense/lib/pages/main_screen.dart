@@ -14,6 +14,7 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
   bool _isAddingObject = false;
+  bool _isRecording = false;
 
   void _onItemTapped(int index) {
     setState(() {
@@ -26,6 +27,20 @@ class _MainScreenState extends State<MainScreen> {
     setState(() {
       _isAddingObject = true;
     });
+  }
+
+  void _startRecording() async {
+    setState(() {
+      _isRecording = true;
+    });
+    await AudioService.startRecording();
+    setState(() {
+      _isRecording = false;
+    });
+  }
+
+  void _stopRecording() async {
+    await AudioService.stopRecording();
   }
 
   @override
@@ -92,12 +107,15 @@ class _MainScreenState extends State<MainScreen> {
             BottomNavigationBarItem(
               icon: GestureDetector(
                 onLongPressStart: (details) {
-                  AudioService.startRecording();
+                  _startRecording();
                 },
                 onLongPressEnd: (details) {
-                  AudioService.stopRecording();
+                  _stopRecording();
                 },
-                child: Icon(Icons.mic),
+                child: Icon(
+                  _isRecording ? Icons.stop_circle : Icons.mic,
+                  color: _isRecording ? Colors.red : Color(0xFF92FDFF),
+                ),
               ),
               label: '',
             ),

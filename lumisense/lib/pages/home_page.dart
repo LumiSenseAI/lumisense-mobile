@@ -4,7 +4,12 @@ import 'package:lumisense/providers/user_provider.dart';
 import 'package:lumisense/services/object_service.dart';
 import 'package:lumisense/services/change_state_service.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
@@ -73,9 +78,11 @@ class HomePage extends StatelessWidget {
                             alignment: WrapAlignment.center,
                             children: objects.map((object) {
                               return GestureDetector(
-                                onTap: () {
-                                  if (object['nom'] != null) {
-                                    ChangeStateService.changeObjectState(object['nom']);
+                                onTap: () async {
+                                  if (object['type'] != null) {
+                                    await ChangeStateService.changeObjectState(object['type']);
+                                    // Rafraîchir la liste des objets après le changement d'état
+                                    setState(() {});
                                   } else {
                                     print('Object name is null');
                                   }

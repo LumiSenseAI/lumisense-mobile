@@ -5,10 +5,15 @@ import 'package:http/http.dart' as http;
 class AudioService {
   static final FlutterSoundRecorder _recorder = FlutterSoundRecorder();
   static bool _isRecording = false;
+  static bool _isRecorderInitialized = false;
 
   static Future<void> startRecording() async {
     if (await _requestPermission()) {
       try {
+        if (!_isRecorderInitialized) {
+          await _recorder.openRecorder();
+          _isRecorderInitialized = true;
+        }
         await _recorder.startRecorder(
           toFile: 'audio_record.wav',
           codec: Codec.pcm16WAV,
@@ -17,6 +22,7 @@ class AudioService {
         print('Recording started');
       } catch (e) {
         print('Error starting recording: $e');
+        await _closeRecorder();
       }
     } else {
       print('Microphone permission denied');
@@ -34,6 +40,8 @@ class AudioService {
         await _uploadFile('audio_record.wav');
       } catch (e) {
         print('Error stopping recording: $e');
+      } finally {
+        await _closeRecorder();
       }
     }
   }
@@ -62,6 +70,13 @@ class AudioService {
       }
     } catch (e) {
       print('Error uploading file: $e');
+    }
+  }
+
+  static Future<void> _closeRecorder() async {
+    if (_isRecorderInitialized) {
+      await _recorder.closeRecorder();
+      _isRecorderInitialized = false;
     }
   }
 }
